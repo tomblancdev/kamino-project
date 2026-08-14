@@ -9,7 +9,7 @@
 
 services:
   dev:
-    image: ghcr.io/tomblancdev/kamino-dev:trixie-0.3.0
+    image: ghcr.io/tomblancdev/kamino-dev:trixie-0.3.1
     init: true
     command: ["sleep", "infinity"]
     working_dir: /workspace
