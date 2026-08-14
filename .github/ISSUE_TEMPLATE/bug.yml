@@ -1,12 +1,13 @@
-name: Bug report
-description: Something behaves differently from what it should
+name: Malfunction report
+description: A unit is behaving differently from specification
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file this. The single most useful thing
-        you can provide is a reliable way to reproduce it.
+        Thanks for filing this. The single most useful thing you can provide
+        is a reliable way to reproduce it — a defect that can be repeated is a
+        defect that can be corrected.
 
   - type: textarea
     id: what-happened

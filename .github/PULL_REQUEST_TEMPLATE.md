@@ -1,6 +1,8 @@
 <!--
 Keep this short. A PR description exists to save the reviewer time, not to
 prove work happened — the diff already does that.
+
+Every clone starts identical; the changes are what make it yours.
 -->
 
 ## What and why

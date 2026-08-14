@@ -1,5 +1,5 @@
-name: Feature request
-description: Suggest something the project should do
+name: Requisition request
+description: Request a capability this unit does not yet have
 labels: ["enhancement"]
 body:
   - type: textarea

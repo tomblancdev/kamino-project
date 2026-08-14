@@ -1,71 +1,79 @@
-# Project template
+<pre>
+   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  █  T I P O C A   C I T Y         █
+  █  growth chamber · ready        █
+   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+</pre>
 
-Copy these files into a new project to get the shared development environment.
-Nothing here needs renaming — the project name comes from the directory.
+# The genome
+
+This is the template every project is grown from. It is not a project itself —
+it is the pattern they are decanted from.
+
+Press **Use this template** above, or:
 
 ```sh
-bash scripts/clone.sh ../my-new-project   # or: just clone ../my-new-project
-cd ../my-new-project
-# then set the runtimes in mise.toml
+gh repo create my-app --template tomblancdev/kamino-project --private --clone
 ```
+
+Then open the folder in VS Code and choose **Reopen in Container**. That is the
+whole setup.
+
+## What happens on first start
+
+The new repo arrives carrying a `.kamino-template` marker. On the first
+container start, `kamino-init` — which lives in the
+[base image](https://github.com/tomblancdev/kamino), not in this repo — reads
+the git remote and your git identity, then writes:
+
+- a `README.md` with the project's own wordmark and badges, replacing this file
+- a `LICENSE`, a `.kamino` record, and the terminal wordmark
+- a unit designation: a number and a name, like `CT-1141 "Cody"`
+
+Then it deletes its own marker, so it never runs twice. Nothing to run by hand.
+
+## What you actually edit
 
 | File | Purpose | Edit it? |
 | --- | --- | --- |
-| `compose.yaml` | Service, mounts, cache volumes | Set the image tag |
-| `.devcontainer/devcontainer.json` | Editor integration | Rarely |
 | `mise.toml` | Language runtimes | **Yes — this is the project's identity** |
-| `justfile` | Tasks, run inside the container | **Yes — test/lint/fmt** |
+| `justfile` | Tasks, run inside the container | **Yes — test, lint, fmt** |
+| `compose.yaml` | Service, mounts, cache volumes | Only to bump the image tag |
 | `lefthook.yml` | Hooks: secrets, lint, commit format | Rarely |
 | `cliff.toml` | Changelog rules | Rarely |
+| `.devcontainer/devcontainer.json` | Editor integration | Rarely |
 | `.devcontainer/post-create.project.sh` | Committed setup (deps, migrations) | Optional |
 
-`.github/` — issue forms, PR template, dependabot, CI and release workflows —
-is **opt-in**, because an empty project does not need a vulnerability policy or
-a release pipeline yet. Answer yes at the prompt, or copy the directory over
-later.
+Every clone starts identical. What it becomes is up to you.
 
-`README.md` is generated per clone by `clone.sh`, so this file is only what you
-see when browsing the template itself.
+## Pick a language
 
-## Start it
-
-VS Code: *Reopen in Container*. Otherwise:
+The image ships no runtime on purpose, so one base serves every stack:
 
 ```sh
-docker compose up -d
-docker compose exec dev dev-init   # once per container
-docker compose exec dev zsh
+mise use node@22        # or python@3.13, go@1.24, rust@stable ...
 ```
 
-Starting the container needs no `just` on the host — that's on purpose, so the
-host stays free of tooling. The `justfile` holds tasks you run *inside* the
-container, where `just` is always present.
+That writes `mise.toml`. Commit it, and everyone gets the same versions on the
+next container build.
 
-## Adding a language
+## Conventions you inherit
 
-```sh
-mise use node@22
-```
+Commits follow [Conventional Commits](https://www.conventionalcommits.org),
+enforced by a hook. Secrets are scanned before every commit and before every
+push. Releases derive their version and changelog from those commits:
+`just release`, then `git push --follow-tags`.
 
-That writes `mise.toml`, installs into a persistent volume, and puts it on
-`PATH`. Commit the file and everyone gets identical versions.
+CI runs the *same* hooks inside the *same* image, so it cannot drift from your
+machine.
 
-## When the base image isn't enough
+## Changing the genome
 
-If the project needs system packages the base doesn't carry, add a thin
-`Containerfile` and point `compose.yaml` at it with `build:` instead of
-`image:`:
+Edit this repository directly — it is the template, not a generated copy.
+Changes reach new projects immediately; existing ones are unaffected, because
+each pins its own base image tag.
 
-```dockerfile
-FROM ghcr.io/tomblancdev/kamino-dev:trixie-0.1.0
-RUN sudo apt-get update \
- && sudo apt-get install -y --no-install-recommends libpq-dev \
- && sudo rm -rf /var/lib/apt/lists/*
-```
+---
 
-Prefer this over forking the base image — you keep inheriting its updates.
-
-## Upgrading the base
-
-Change the tag in `compose.yaml` and rebuild. Because the tag is pinned, this
-is a deliberate act rather than something that happens to you mid-sprint.
+<sub>Grown on <a href="https://github.com/tomblancdev/kamino">Kamino</a>.
+The lore is decoration; every command and error message says what it means.</sub>
