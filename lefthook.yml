@@ -1,0 +1,44 @@
+# Git hooks, run by lefthook — a single Go binary already in the base image, so
+# there is no Python or Node runtime to install just to lint a commit.
+#
+# Installed automatically by dev-init when this file exists.
+#
+#   lefthook run pre-commit    run the checks by hand
+#   LEFTHOOK=0 git commit      bypass everything, once
+#
+# Hooks run wherever git runs — which is inside the container. Commit from a
+# host terminal and the tools below will not be on PATH.
+
+pre-commit:
+  parallel: true
+  commands:
+    # Catches an AWS key or a token before it becomes permanent history.
+    secrets:
+      run: gitleaks git --staged --redact --no-banner
+
+    shell:
+      glob: "*.{sh,bash}"
+      run: shellcheck {staged_files}
+
+    containerfile:
+      glob: "{Containerfile,Dockerfile,*.Containerfile,*.Dockerfile}"
+      run: hadolint {staged_files}
+
+    # Cheap hygiene that reviewers should never have to mention.
+    conflict-markers:
+      run: |
+        if grep -InE '^(<<<<<<<|>>>>>>>) ' {staged_files} 2>/dev/null; then
+          echo "unresolved merge conflict markers"; exit 1
+        fi
+
+commit-msg:
+  commands:
+    conventional:
+      # dev-commit-msg lives in the base image, not in this repo.
+      run: dev-commit-msg {1}
+
+pre-push:
+  commands:
+    # A full-history scan is too slow for every commit, but fine before push.
+    secrets-history:
+      run: gitleaks git --redact --no-banner

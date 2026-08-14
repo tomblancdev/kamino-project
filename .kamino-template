@@ -1,0 +1,11 @@
+# This file marks an un-personalised checkout of the kamino template.
+#
+# On the first container create, `kamino-init` reads the git remote, your git
+# identity and the repo description, writes README.md, LICENSE, .kamino and the
+# terminal wordmark — then deletes this file. Nothing to run by hand.
+#
+# To redo it later, or to answer the questions yourself:
+#
+#   kamino-init --force --interactive
+#
+# Delete this file to skip personalisation entirely.

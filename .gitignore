@@ -1,0 +1,30 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Personal, machine-local container setup
+.devcontainer/post-create.local.sh
+compose.override.yaml
+
+# direnv / mise
+.direnv/
+.mise.local.toml
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build output / logs
+dist/
+build/
+out/
+*.log

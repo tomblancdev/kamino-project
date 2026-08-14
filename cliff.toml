@@ -1,0 +1,75 @@
+# git-cliff — CHANGELOG generation from Conventional Commits.
+#
+# Language-agnostic on purpose: the changelog comes from git history, not from
+# a package manifest, so this works identically whatever mise.toml ends up
+# declaring. git-cliff is a single Rust binary already in the base image.
+#
+#   just changelog       regenerate CHANGELOG.md
+#   just next-version    what the next tag would be
+#   just release         bump, changelog, commit, tag
+
+[changelog]
+header = """
+# Changelog
+
+All notable changes to this project are documented here.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Entries are generated from [Conventional Commits](https://www.conventionalcommits.org).\n
+"""
+
+body = """
+{% if version %}\
+## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {% if commit.breaking %}**breaking** {% endif %}\
+{% if commit.scope %}*{{ commit.scope }}*: {% endif %}\
+{{ commit.message | upper_first }}\
+{% endfor %}
+{% endfor %}\n
+"""
+
+footer = ""
+trim = true
+postprocessors = []
+
+[bump]
+# Without this, the very first release fails: git-cliff proposes "0.1.0",
+# which does not match the `v[0-9]*` tag pattern below, and errors out. Every
+# new project hits that on its first `just release`.
+initial_tag = "v0.1.0"
+
+[git]
+conventional_commits = true
+# Unconventional commits are dropped rather than dumped into an "other" bucket —
+# the commit-msg hook means they should not exist, and silence is a better
+# signal than noise.
+filter_unconventional = true
+split_commits = false
+protect_breaking_commits = true
+filter_commits = false
+tag_pattern = "v[0-9]*"
+topo_order = false
+sort_commits = "oldest"
+
+commit_parsers = [
+  { message = "^feat",             group = "Added" },
+  { message = "^fix",              group = "Fixed" },
+  { message = "^perf",             group = "Performance" },
+  { message = "^refactor",         group = "Changed" },
+  { message = "^revert",           group = "Reverted" },
+  { message = "^docs",             group = "Documentation" },
+  { message = "^test",             group = "Testing" },
+  { message = "^ci",               group = "CI" },
+  { message = "^build",            group = "Build" },
+  # Release commits describe the release itself; listing them inside it is noise.
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^chore",            group = "Chores" },
+  { message = "^style",            skip = true },
+]

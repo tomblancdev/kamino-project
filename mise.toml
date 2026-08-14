@@ -1,0 +1,19 @@
+# The one file that decides what language this project is.
+#
+# The base image ships no runtime, so nothing here conflicts with anything.
+# `dev-init` runs `mise install` on container create, so a clone plus a rebuild
+# reproduces the exact versions below.
+#
+#   mise use node@22        adds a tool and writes it here
+#   mise use -r python@3.13 removes one
+#
+# Delete the example and add what you need.
+
+[tools]
+# node = "22"
+# python = "3.13"
+# go = "1.24"
+
+[env]
+# Project-wide environment variables, applied on cd into the directory.
+# DATABASE_URL = "postgres://localhost/dev"

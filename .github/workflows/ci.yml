@@ -1,0 +1,92 @@
+name: ci
+
+# Runs inside the same image the devcontainer uses, and runs the *same*
+# lefthook checks a local commit runs. That is the point: CI cannot drift from
+# your machine, because it is not a second list of tools — it is the same list,
+# at the same versions.
+#
+# Requires the base image to be pullable. If the GHCR package is private, make
+# it public, or add:
+#   credentials:
+#     username: ${{ github.actor }}
+#     password: ${{ secrets.GITHUB_TOKEN }}
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DEV_IMAGE: ghcr.io/tomblancdev/kamino-dev:trixie-0.1.0
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/tomblancdev/kamino-dev:trixie-0.1.0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # gitleaks and git-cliff both want history
+
+      - name: Trust the workspace
+        # The checkout is owned by a different uid than the container user, so
+        # git refuses to operate on it until it is marked safe.
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Run the pre-commit hooks over the whole tree
+        run: lefthook run pre-commit --all-files --force
+
+      - name: Scan the full history for secrets
+        run: gitleaks git --redact --no-banner
+
+  commits:
+    # Conventional Commits are enforced locally by a commit-msg hook, which a
+    # contributor can bypass. This is the backstop.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/tomblancdev/kamino-dev:trixie-0.1.0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Trust the workspace
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Check every commit message in this PR
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -u
+          failed=0
+          for sha in $(git rev-list "${BASE_SHA}..${HEAD_SHA}"); do
+            git log -1 --format=%B "${sha}" > /tmp/msg
+            if ! dev-commit-msg /tmp/msg; then
+              echo "  ^ in commit ${sha}"
+              failed=1
+            fi
+          done
+          if [ "${failed}" -ne 0 ]; then
+            echo "::error::one or more commit messages are not Conventional Commits"
+            exit 1
+          fi
+          echo "all commit messages look good"
+
+  # Uncomment once mise.toml declares a runtime. mise is already in the image,
+  # so the runtime comes from the same file your machine uses.
+  #
+  # test:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: ghcr.io/tomblancdev/kamino-dev:trixie-0.1.0
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - run: mise install
+  #     - run: just test

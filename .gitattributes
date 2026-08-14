@@ -1,0 +1,15 @@
+# This project is developed inside a Linux container, so the working tree must
+# be LF even when checked out on Windows. Without this, a clone with
+# core.autocrlf=true breaks shell scripts in the container:
+#
+#   /usr/bin/env: 'bash\r': No such file or directory
+
+* text=auto eol=lf
+
+justfile        text eol=lf
+Containerfile   text eol=lf
+
+*.png  binary
+*.jpg  binary
+*.ico  binary
+*.gz   binary

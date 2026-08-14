@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+
+  // Names itself after the folder, so there is nothing to rename per project.
+  "name": "${localWorkspaceFolderBasename}",
+
+  "dockerComposeFile": ["../compose.yaml"],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "dev",
+  "shutdownAction": "stopCompose",
+
+  // dev-init is baked into the base image — no copy of it lives here. It reads
+  // mise.toml, installs git hooks, and runs .devcontainer/post-create.project.sh
+  // and post-create.local.sh if they exist.
+  "postCreateCommand": "dev-init"
+
+  // Editor settings deliberately absent: the image already makes zsh the login
+  // shell, and formatting preferences belong in your user settings or an
+  // .editorconfig the project adds when it has code to format.
+}

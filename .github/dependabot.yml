@@ -1,0 +1,30 @@
+version: 2
+
+# Only GitHub Actions by default — that is the one ecosystem every clone has,
+# whatever language it ends up in. Add your own once mise.toml picks a stack:
+#
+#   - package-ecosystem: "npm"     directory: "/"
+#   - package-ecosystem: "pip"     directory: "/"
+#   - package-ecosystem: "gomod"   directory: "/"
+#   - package-ecosystem: "cargo"   directory: "/"
+#
+# Docker is listed too, but only fires if the project adds its own Containerfile
+# on top of the base image.
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "build"

@@ -1,0 +1,38 @@
+# Development environment for this project.
+#
+# No `name:` and no `build:` on purpose — Compose derives the project name from
+# the containing directory, which also namespaces the volumes below. Two
+# projects using this template never collide over a cached runtime or a login.
+#
+# Pin a real tag. `:latest` means an unrelated base-image change can break this
+# project at the worst possible moment.
+
+services:
+  dev:
+    image: ghcr.io/tomblancdev/kamino-dev:trixie-0.1.0
+    init: true
+    command: ["sleep", "infinity"]
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+      - dev-cache:/home/dev/.cache
+      - dev-state:/home/dev/.local/state
+      - dev-share:/home/dev/.local/share
+      - dev-claude:/home/dev/.claude
+      # Host Docker access. Commented out by default: the mounted socket is
+      # equivalent to root on the host, so the container stops being a security
+      # boundary. Uncomment only when the project actually needs it.
+      # - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: ${TZ:-Etc/UTC}
+      CLAUDE_CONFIG_DIR: /home/dev/.claude
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+volumes:
+  dev-cache:
+  dev-state:
+  dev-share:
+  dev-claude:

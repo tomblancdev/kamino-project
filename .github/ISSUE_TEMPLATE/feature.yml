@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest something the project should do
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: >
+        Describe the situation you are in, not the solution you have in mind.
+        The best feature requests start from a problem someone actually hit.
+      placeholder: |
+        When deploying to staging I have to hand-edit three files, and I keep
+        forgetting the third one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+      description: Optional — a rough sketch is fine.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried or considered?
+      description: >
+        Including "nothing, this is a first thought" is a perfectly good answer.
