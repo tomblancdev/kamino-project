@@ -32,7 +32,7 @@ jobs:
       # user, so actions/checkout cannot write its state files without this.
       options: --user root
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # gitleaks and git-cliff both want history
 
@@ -58,7 +58,7 @@ jobs:
       # user, so actions/checkout cannot write its state files without this.
       options: --user root
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -93,6 +93,6 @@ jobs:
   #   container:
   #     image: ghcr.io/tomblancdev/kamino-dev:trixie-0.5.0
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v7
   #     - run: mise install
   #     - run: just test
