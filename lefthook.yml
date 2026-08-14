@@ -16,13 +16,23 @@ pre-commit:
     secrets:
       run: gitleaks git --staged --redact --no-banner
 
+    # These discover their own files with `git ls-files` rather than lefthook's
+    # {staged_files} template. The template is empty when a glob matches nothing,
+    # and under `--all-files` (how CI runs) lefthook still invokes the command,
+    # so shellcheck and hadolint fail on usage instead of being skipped.
     shell:
-      glob: "*.{sh,bash}"
-      run: shellcheck {staged_files}
+      run: |
+        files=$(git ls-files '*.sh' '*.bash')
+        [ -n "$files" ] || exit 0
+        # shellcheck disable=SC2086
+        shellcheck $files
 
     containerfile:
-      glob: "{Containerfile,Dockerfile,*.Containerfile,*.Dockerfile}"
-      run: hadolint {staged_files}
+      run: |
+        files=$(git ls-files 'Containerfile' 'Dockerfile' '*.Containerfile' '*.Dockerfile')
+        [ -n "$files" ] || exit 0
+        # shellcheck disable=SC2086
+        hadolint $files
 
     # Cheap hygiene that reviewers should never have to mention.
     conflict-markers:
