@@ -21,13 +21,13 @@ permissions:
   contents: read
 
 env:
-  DEV_IMAGE: ghcr.io/tomblancdev/kamino-dev:trixie-0.3.1
+  DEV_IMAGE: ghcr.io/tomblancdev/kamino-dev:trixie-0.4.0
 
 jobs:
   checks:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/tomblancdev/kamino-dev:trixie-0.3.1
+      image: ghcr.io/tomblancdev/kamino-dev:trixie-0.4.0
       # GitHub mounts its workspace as a uid that is not this image's `dev`
       # user, so actions/checkout cannot write its state files without this.
       options: --user root
@@ -53,7 +53,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/tomblancdev/kamino-dev:trixie-0.3.1
+      image: ghcr.io/tomblancdev/kamino-dev:trixie-0.4.0
       # GitHub mounts its workspace as a uid that is not this image's `dev`
       # user, so actions/checkout cannot write its state files without this.
       options: --user root
@@ -91,7 +91,7 @@ jobs:
   # test:
   #   runs-on: ubuntu-latest
   #   container:
-  #     image: ghcr.io/tomblancdev/kamino-dev:trixie-0.3.1
+  #     image: ghcr.io/tomblancdev/kamino-dev:trixie-0.4.0
   #   steps:
   #     - uses: actions/checkout@v4
   #     - run: mise install

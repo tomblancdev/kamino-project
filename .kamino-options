@@ -1,0 +1,11 @@
+# Choices applied on the first container start, then this file is deleted.
+# Everything here can equally be done later with `kamino add`.
+#
+# Licence for the generated LICENSE file: mit, apache-2.0, gpl-3.0, none
+LICENSE=mit
+
+# Optional extras. `kamino list` shows what exists.
+#   claude        CLAUDE.md, permissions, a bypass-guard hook, a release skill
+#   editorconfig  editor formatting defaults
+#   tag-format    v1.2.3 vs 1.2.3   (add with: kamino add tag-format bare)
+FEATURES=""
